@@ -1,0 +1,45 @@
+[workshop]
+localhost ansible_connection=local
+
+[workshop:vars]
+# Users
+usersno=1
+
+# OCP 
+ocp_domain=foo.sandbox45.opentlc.com
+ocp_apps_domain=apps.foo.sandbox45.opentlc.com
+
+# general
+configure_only=false
+create_realms=true
+
+# sso
+sso=false
+sso_project=sso
+sso_version=sso72-dev
+sso_secret_version=ose-v1.4.18
+
+# 3scale
+threescale=false
+namespace=3scale
+threescale_realm=threescale
+threescale_client_id=3scale-admin
+no_threescale_services=false
+wildcard_route_name=apicast-wildcard-router
+create_tenants=false
+threescale_master_access_token=mastertoken
+threescale_admin_access_token=admintoken
+
+# Apicurio
+apicurio=false
+apicurio_template_url=https://raw.githubusercontent.com/jbossdemocentral/3scale-api-workshop/master/support/templates/apicurio-template.yml
+apicurio_template_params=""
+apicurio_project=apicurio
+
+# Microcks
+microcks=true
+microcks_project=microcks
+
+# Gogs
+gogs=false
+gogs_project=gogs

@@ -1,0 +1,24 @@
+---
+- import_role:
+    name: provision_sso
+  when: sso == 'true'
+
+- import_role:
+    name: provision_threescale
+  when: threescale == 'true'
+
+- import_role:
+    name: provision_apicurio
+  when: apicurio == 'true'
+
+- import_role:
+    name: provision_microcks
+  when: microcks == 'true'
+
+- import_role:
+    name: provision_gogs
+  when: gogs == 'true'
+
+#- import_role:
+#    name: provision_backend
+#  when: backend

@@ -1,0 +1,21 @@
+---
+- name: "Find oc"
+  hosts: workshop
+  tasks:
+    - name: check openshift log in
+      command: >-
+        oc whoami
+      ignore_errors: no
+      register: oc_whoami
+
+- name: "Get master config"
+  hosts: master
+  gather_facts: no
+  tasks:
+  - include_role:
+      name: master_config
+      
+- name: "Install API Workshop"
+  hosts: workshop
+  roles:
+    - workshop
