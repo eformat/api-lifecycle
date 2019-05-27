@@ -2,7 +2,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: {{ wildcard_route_name }}
-  namespace: {{ namespace }}
+  namespace: {{ threescale_project }}
 spec:
   host: apicast-wildcard.amp.{{ ocp_apps_domain }}
   port:

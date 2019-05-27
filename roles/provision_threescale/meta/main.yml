@@ -1,2 +1,2 @@
 dependencies:
-  - { role: project, when: configure_only == 'false', project: '{{ namespace }}', display_name: '3scale API Management' }
+  - { role: project, when: configure_only == 'false', project: '{{ threescale_project }}', display_name: '3scale API Management' }

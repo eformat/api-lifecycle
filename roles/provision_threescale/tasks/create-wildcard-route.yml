@@ -4,7 +4,7 @@
   register: patch_openshift_router
 
 - name: Delete the existing wildcard route if it exists
-  shell: oc delete route {{ wildcard_route_name }} -n {{ namespace }}
+  shell: oc delete route {{ wildcard_route_name }} -n {{ threescale_project }}
   register: delete_wildcard_route
   failed_when: delete_wildcard_route.stderr != '' and 'not found' not in delete_wildcard_route
 
@@ -13,5 +13,5 @@
     dest: /tmp/wildcard-route.yml
 
 - name: Create wildcard route
-  shell: oc create -f /tmp/wildcard-route.yml -n {{ namespace }}
+  shell: oc create -f /tmp/wildcard-route.yml -n {{ threescale_project }}
   register: create_wildcard_route

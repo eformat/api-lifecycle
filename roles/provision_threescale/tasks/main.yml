@@ -6,13 +6,13 @@
   shell: "oc new-app -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/master/amp/amp.yml \
   --param WILDCARD_DOMAIN={{ ocp_apps_domain }} --param ADMIN_PASSWORD=password --param WILDCARD_POLICY=Subdomain \
   --param ADMIN_ACCESS_TOKEN={{threescale_admin_access_token}} --param MASTER_PASSWORD=password \  
-  --param MASTER_ACCESS_TOKEN={{threescale_master_access_token}} -n {{ namespace }}"
+  --param MASTER_ACCESS_TOKEN={{threescale_master_access_token}} -n {{ threescale_project }}"
   when: configure_only == 'false'
   register: command_result
   failed_when: "command_result.rc != 0 and 'already exists' not in command_result.stderr"  
 
 - name: Delete RWX storage as RWO (hack)
-  shell: "oc -n {{ namespace }} delete pvc/system-storage"
+  shell: "oc -n {{ threescale_project }} delete pvc/system-storage"
   when: command_result.rc == 0
   failed_when: command_result.stderr != '' and 'not found' not in command_result
 
@@ -22,7 +22,7 @@
   when: command_result.rc == 0
 
 - name: Create RWO (hack)
-  shell: oc create -f /tmp/storage.yml -n {{ namespace }}
+  shell: oc create -f /tmp/storage.yml -n {{ threescale_project }}
   when: command_result.rc == 0  
 
 - name: Wait until 3scale API is available 

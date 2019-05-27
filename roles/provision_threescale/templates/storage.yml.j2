@@ -1,7 +1,7 @@
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
-  namespace: {{ namespace }}
+  namespace: {{ threescale_project }}
   annotations:
   creationTimestamp: null
   finalizers:
@@ -17,4 +17,4 @@ spec:
   resources:
     requests:
       storage: 100Mi
-      
+
