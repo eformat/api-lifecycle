@@ -16,12 +16,15 @@ create_realms=true
 # sso
 sso=false
 sso_project=sso
-sso_version=sso72-dev
-sso_secret_version=ose-v1.4.18
+sso_template={{playbook_dir}}/templates/sso72-mysql-persistent.json
+sso_image_streams={{playbook_dir}}/templates/sso72-image-stream.json
+sso_secret_url=templates/sso-app-secret.json
+sso_master_realm_url={{playbook_dir}}/templates/realm-template.json
 
 # 3scale
 threescale=false
 threescale_project=3scale
+threescale_template={{playbook_dir}}/templates/amp.yml
 threescale_realm=threescale
 threescale_client_id=3scale-admin
 no_threescale_services=false
@@ -32,14 +35,22 @@ threescale_admin_access_token=admintoken
 
 # Apicurio
 apicurio=false
-apicurio_template_url=https://raw.githubusercontent.com/jbossdemocentral/3scale-api-workshop/master/support/templates/apicurio-template.yml
+apicurio_template_url={{playbook_dir}}/templates/apicurio-template.yml
 apicurio_template_params=""
 apicurio_project=apicurio
+apicurio_realm_url={{playbook_dir}}/templates/apicurio-realm.json
 
 # Microcks
-microcks=true
+microcks=false
 microcks_project=microcks
+microcks_template={{playbook_dir}}/templates/microcks-template.yml
+microcks_realm_url={{playbook_dir}}/templates/microcks-realm.json
 
 # Gogs
-gogs=false
+gogs=true
 gogs_project=gogs
+gogs_template={{playbook_dir}}/templates/gogs-template.yaml
+gogs_git_config_url={{playbook_dir}}/templates/gogs.json
+gogs_www_url={{playbook_dir}}/templates/gogs-www.json
+gogs_version=0.11.34
+gogs_skip_tls=true

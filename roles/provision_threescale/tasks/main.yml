@@ -3,7 +3,7 @@
   shell: "oc project default"
 
 - name: Create the 3scale app
-  shell: "oc new-app -f https://raw.githubusercontent.com/3scale/3scale-amp-openshift-templates/master/amp/amp.yml \
+  shell: "oc new-app -f {{ threescale_template }} \
   --param WILDCARD_DOMAIN={{ ocp_apps_domain }} --param ADMIN_PASSWORD=password --param WILDCARD_POLICY=Subdomain \
   --param ADMIN_ACCESS_TOKEN={{threescale_admin_access_token}} --param MASTER_PASSWORD=password \  
   --param MASTER_ACCESS_TOKEN={{threescale_master_access_token}} -n {{ threescale_project }}"

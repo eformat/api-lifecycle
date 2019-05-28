@@ -23,16 +23,18 @@
   when: create_realms == 'true'
 
 - name: Get Apicurio realm
-  uri:
-    url: 'https://raw.githubusercontent.com/jbossdemocentral/3scale-api-workshop/master/support/templates/apicurio-realm.json'
-    return_content: yes
+#  uri:
+#    url: "{{ apicurio_realm_url }}"
+#    return_content: yes
+  slurp:
+    src: "{{ apicurio_realm_url }}"    
   register: apicurio_realm
   when: create_realms == 'true'
 
-- debug: var=apicurio_realm.content
+- debug: var=apicurio_realm.content|b64decode
   when: create_realms
 
-- set_fact: realm={{ apicurio_realm.content | regex_replace('APICURIO_UI_URL', 'http://apicurio-studio.' + ocp_apps_domain) }}
+- set_fact: realm={{ apicurio_realm.content | b64decode | regex_replace('APICURIO_UI_URL', 'http://apicurio-studio.' + ocp_apps_domain) }}
   when: create_realms == 'true'
 
 - debug: var=realm

@@ -9,11 +9,11 @@
   ignore_errors: true
 
 - name: Create image streams for RH SSO
-  shell: "oc create -f https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/{{ sso_version }}/templates/sso72-image-stream.json -n openshift"
+  shell: "oc create -f {{ sso_image_streams }} -n openshift"
   when: configure_only == 'false' and imagestream_exists.failed
 
 - name: Create secrets for RH SSO
-  shell: "oc create -f https://raw.githubusercontent.com/jboss-openshift/application-templates/{{ sso_secret_version }}/secrets/sso-app-secret.json -n {{ sso_project }}"
+  shell: "oc create -f {{ sso_secret_url }} -n {{ sso_project }}"
   when: configure_only == 'false'
   register: command_result
   failed_when: "command_result.rc != 0 and 'already exists' not in command_result.stderr"  
@@ -32,7 +32,7 @@
 
 - name: Create RH SSO app
   shell:
-    "oc new-app -f https://raw.githubusercontent.com/jboss-container-images/redhat-sso-7-openshift-image/{{ sso_version }}/templates/sso72-mysql-persistent.json -p HTTPS_NAME=jboss -p HTTPS_PASSWORD=mykeystorepass -p SSO_ADMIN_USERNAME=keyadmin \
+    "oc new-app -f {{ sso_template }} -p HTTPS_NAME=jboss -p HTTPS_PASSWORD=mykeystorepass -p SSO_ADMIN_USERNAME=keyadmin \
     -p SSO_ADMIN_PASSWORD=keypassword -n {{sso_project}}"
   when: configure_only == 'false'
   register: command_result
@@ -62,13 +62,15 @@
   when: create_realms == 'true'
 
 - name: Get templated realm
-  uri:
-    url: "https://raw.githubusercontent.com/jbossdemocentral/3scale-api-workshop/master/support/templates/realm-template.json"
-    return_content: yes
+#  uri:
+#    url: "{{ sso_master_realm_url }}"
+#    return_content: yes
+  slurp:
+    src: "{{ sso_master_realm_url }}"
   register: get_realm
   when: create_realms == 'true'
 
-- debug: var=get_realm.content
+- debug: var=get_realm.content|b64decode
   when: create_realms == 'true'
 
 - name: Get SSO token

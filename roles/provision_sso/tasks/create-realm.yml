@@ -1,4 +1,4 @@
-- set_fact: realm={{ get_realm.content | regex_replace('userx', item) }}
+- set_fact: realm={{ get_realm.content | b64decode | regex_replace('userx', item) }}
 
 - debug: var=realm
 

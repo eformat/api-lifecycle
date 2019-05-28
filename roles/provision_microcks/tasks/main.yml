@@ -19,16 +19,18 @@
 - debug: var=TKN
 
 - name: Get Microcks realm
-  uri:
-    url: 'https://raw.githubusercontent.com/jbossdemocentral/3scale-api-workshop/master/support/templates/microcks-realm.json'
-    return_content: yes
+#  uri:
+#    url: "{{ microcks_realm_url }}"
+#    return_content: yes
+  slurp:
+    src: "{{ microcks_realm_url }}"   
   register: microcks_realm
   when: create_realms == 'true'
 
-- debug: var=microcks_realm.content
+- debug: var=microcks_realm.content|b64decode
   when: create_realms
 
-- set_fact: realm={{ microcks_realm.content | regex_replace('MICROCKS_UI_URL', 'http://microcks.' + ocp_apps_domain) }}
+- set_fact: realm={{ microcks_realm.content | b64decode | regex_replace('MICROCKS_UI_URL', 'http://microcks.' + ocp_apps_domain) }}
 
 - debug: var=realm
 
@@ -59,14 +61,33 @@
   with_sequence: start=1 end={{ usersno }} format=user%d
 
 - name: Create Microcks app
-  shell: "oc new-app -f https://raw.githubusercontent.com/eformat/3scale-api-workshop/master/support/templates/microcks-template.yml \
+  shell: "oc new-app -f {{ microcks_template }} \
   -p KEYCLOAK_ROUTE_HOSTNAME=secure-sso-{{sso_project}}.{{ ocp_apps_domain }} -p APP_ROUTE_HOSTNAME={{ microcks_project }}.{{ ocp_apps_domain }} \
   -n {{ microcks_project }}"
   when: configure_only == 'false'
   register: create_microcks_app
   failed_when: create_microcks_app.stderr != '' and 'already exists' not in create_microcks_app.stderr
 
-#- name: patch microcks env
-#  shell: "oc set env dc/microcks KEYCLOAK_URL=https://secure-sso-{{sso_project}}.{{ ocp_apps_domain }}/auth -n {{microcks_project}}"
-#  register: oc_cmd
-#  failed_when: oc_cmd.rc != 0  
+- name: Clean Files
+  file: path=/tmp/sso.pem state=absent
+  file: path=/tmp/keystore.jks state=absent
+
+- name: Get SSO SSL Certificate
+  shell: "openssl s_client -connect secure-sso-{{sso_project}}.{{ ocp_apps_domain }}:443 -showcerts </dev/null 2>/dev/null|openssl x509 -outform PEM > /tmp/sso.pem"
+  register: get_ssl_cert
+  failed_when: get_ssl_cert.rc != 0
+
+- name: Create keystore
+  shell: "keytool -importcert -keystore /tmp/keystore.jks -storetype JKS -file /tmp/sso.pem -alias sso -storepass password -trustcacerts -noprompt"
+  register: create_keystore
+  failed_when: create_keystore != 0 and 'Certificate was added to keystore' not in create_keystore.stderr
+
+- name: Create Keystore Secret
+  shell: "oc -n {{ microcks_project }} create secret generic sso-secret --from-file=/tmp/keystore.jks"
+  register: oc_cmd
+  failed_when: oc_cmd.rc != 0
+
+- name: Mount Keystore Secret
+  shell: "oc -n {{ microcks_project }} set volume dc/{{ microcks_project }} --add --overwrite -t secret --secret-name=sso-secret --name=sso-secret --mount-path=/etc/secrets --overwrite"
+  register: oc_cmd
+  failed_when: oc_cmd.rc != 0

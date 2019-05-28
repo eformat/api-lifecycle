@@ -4,7 +4,7 @@
 
 - name: Create Gogs app
   shell: "oc new-app \
-  -f {{ gogs_template_url }} \
+  -f {{ gogs_template }} \
   -p GOGS_VERSION={{ gogs_version }} \
   -p SKIP_TLS_VERIFY={{ gogs_skip_tls }} \
   -p HOSTNAME=gogs.{{ ocp_apps_domain }} \
@@ -49,18 +49,20 @@
 - debug: var=create_tenant_result
 
 - name: Get Git Repo
-  uri:
-    url: "{{ gogs_git_config_url }}"
-    return_content: yes
+#  uri:
+#    url: "{{ gogs_git_config_url }}"
+#    return_content: yes
+  slurp:
+    src: "{{ gogs_git_config_url }}"   
   register: get_gitrepo
   
-- debug: var=get_gitrepo.content
+- debug: var=get_gitrepo.content|b64decode
 
 - name: Config repo
   uri: 
     url: 'http://gogs.{{ ocp_apps_domain }}/api/v1/repos/migrate'
     method: POST
-    body: "{{ get_gitrepo.content | regex_replace('USER_ID', item) }}"
+    body: "{{ get_gitrepo.content | b64decode | regex_replace('USER_ID', item) }}"
     body_format: json
     user: "user{{ (item|int) - 1 }}"
     password: "openshift"
@@ -75,18 +77,20 @@
   failed_when: config_repo.status != 201 and 'already exists' not in config_repo.content
 
 - name: Get WWW Git Repo
-  uri:
-    url: 'https://raw.githubusercontent.com/RedHatWorkshops/dayinthelife-integration/master/support/templates/gogs-www.json'
-    return_content: yes
+#  uri:
+#    url: "{{ gogs_www_url }}"
+#    return_content: yes
+  slurp:
+    src: "{{ gogs_www_url }}"   
   register: get_gitrepo
   
-- debug: var=get_gitrepo.content
+- debug: var=get_gitrepo.content|b64decode
 
 - name: Config repo
   uri: 
     url: 'http://gogs.{{ ocp_apps_domain }}/api/v1/repos/migrate'
     method: POST
-    body: "{{ get_gitrepo.content | regex_replace('USER_ID', item) }}"
+    body: "{{ get_gitrepo.content | b64decode | regex_replace('USER_ID', item) }}"
     body_format: json
     user: "user{{ (item|int) - 1 }}"
     password: "openshift"
