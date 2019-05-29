@@ -41,3 +41,14 @@ Provisions:
 6. [API Developer Portal](https://github.com/RedHatWorkshops/dayinthelife-integration/tree/master/docs/labs/developer-track/lab06/walkthrough.adoc)
 7. [API Consumption](https://github.com/RedHatWorkshops/dayinthelife-integration/tree/master/docs/labs/developer-track/lab07/walkthrough.adoc)
 8. [Fuse Online and 3scale Smart Discovery Bonus Lab](https://github.com/RedHatWorkshops/dayinthelife-integration/tree/master/docs/labs/developer-track/../citizen-integrator-track/lab07/walkthrough.adoc)
+
+Help for the needy:
+
+```
+# Default logins created by installer
+SSO  (secure-sso-sso.apps):        keyadmin / keypassword
+3scale (3scale-admin.apps):        admin / password
+Apicurio (apicurio-studio.apps):   user1 / openshift
+Microcks (microcks.apps):          user1 / openshift
+Gogs (gogs.apps):                  user1 / openshift
+```
